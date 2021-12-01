@@ -4,6 +4,8 @@ import { Helmet } from 'react-helmet'
 interface WordpressHeaderProps {
   postData: PostData
   dataS: any
+  totalPages?: number
+  currentPage?: number
 }
 
 const buildMetaTag = ({ name, property, content }: MetaTags) => {
@@ -13,7 +15,7 @@ const buildMetaTag = ({ name, property, content }: MetaTags) => {
 }
 
 const WordpressHeader: FunctionComponent<WordpressHeaderProps> = props => {
-  const { postData, dataS } = props
+  const { postData, dataS, totalPages, currentPage } = props
   const {
     type,
     title,
@@ -47,6 +49,10 @@ const WordpressHeader: FunctionComponent<WordpressHeaderProps> = props => {
   return (
     <Helmet>
       <title>{headerTitle}</title>
+      {currentPage && currentPage > 1 &&
+        <link data-react-helmet="true" rel="prev" href={`${window?.location?.href?.split('?')[0]}?page=${currentPage - 1}`} />}
+      {totalPages && currentPage && currentPage < totalPages &&
+        <link data-react-helmet="true" rel="next" href={`${window?.location?.href?.split('?')[0]}?page=${currentPage + 1}`} />}
       {featuredMedia?.media_type === 'image' && featuredMedia?.source_url ? (
         <meta property="og:image" content={featuredMedia?.source_url} />
       ) : (

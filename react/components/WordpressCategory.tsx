@@ -6,6 +6,7 @@ import React, {
   useState,
   useEffect,
   useRef,
+  useMemo
 } from 'react'
 import { useQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
@@ -17,6 +18,7 @@ import { useCssHandles } from 'vtex.css-handles'
 import WordpressTeaser from './WordpressTeaser'
 import CategoryPostsBySlug from '../graphql/CategoryPostsBySlug.graphql'
 import Settings from '../graphql/Settings.graphql'
+import WordpressHeader from './WordpressHeader'
 
 interface CategoryProps {
   customDomains: string
@@ -83,6 +85,26 @@ const WordpressCategory: StorefrontFunctionComponent<CategoryProps> = ({
   const containerRef = useRef<null | HTMLElement>(null)
   const initialPageLoad = useRef(true)
   const [loadingPage, setLoadingPage] = useState(true)
+
+  const memoizedTotalPagesCount = useMemo(() => {
+    const totalPostsCount = data?.wpCategories?.categories[0]?.wpPosts?.total_count
+    const totalPagesCount = isNaN(Math.ceil(totalPostsCount / perPage)) ? 0 : Math.ceil(totalPostsCount / perPage)
+    return totalPagesCount
+  }, [perPage, data?.wpCategories])
+
+  const [totalPages, setTotalPages] = useState<number>(memoizedTotalPagesCount)
+
+  const postDataHeader: PostData = {
+    type: 'page',
+    title: { rendered: data?.wpCategories?.categories[0]?.name, _typename: 'WPTitle' },
+    featured_media: null,
+    excerpt: null,
+    headerTags: null,
+  } as any
+
+  useEffect(() => {
+    setTotalPages(memoizedTotalPagesCount)
+  }, [page, perPage])
 
   useEffect(() => {
     setLoadingPage(true)
@@ -245,6 +267,7 @@ const WordpressCategory: StorefrontFunctionComponent<CategoryProps> = ({
         )}
         {data?.wpCategories?.categories?.length ? (
           <Fragment>
+            <WordpressHeader postData={postDataHeader} dataS={dataS} totalPages={totalPages} currentPage={page} />
             <div className={`${handles.listFlex} mv4 flex flex-row flex-wrap`}>
               {data.wpCategories.categories[0].wpPosts.posts.map(
                 (post: PostData, index: number) => (
