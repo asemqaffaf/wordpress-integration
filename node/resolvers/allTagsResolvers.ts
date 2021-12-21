@@ -54,7 +54,7 @@ export const allTagsResolvers = {
 
     const postsIteration = new Array(upperFloorTotalPosts).fill(0);
 
-    const resultsPostsData: WpPost[][] = await Promise.all(postsIteration.map(async (_, i): Promise<WpPost[]> => {
+    const resultsPostsData: WpPost[][] = await Promise.all(postsIteration.map(async (__, i): Promise<WpPost[]> => {
 
       const { data: remainPostsData } = await wordpressProxy.getPosts({ ...PostsOptions, ...{ page: i + 1, per_page: 100 } })
 
@@ -83,7 +83,7 @@ export const allTagsResolvers = {
 
     const tagsIteration = new Array(upperFloorTotaltags).fill(0);
 
-    const resultsTagsData: WpTag[][] = await Promise.all(tagsIteration.map(async (__, i): Promise<WpTag[]> => {
+    const resultsTagsData: WpTag[][] = await Promise.all(tagsIteration.map(async (___, i): Promise<WpTag[]> => {
 
       const { data } = await wordpressProxy.getTags({ page: i + 1, per_page: 100, include: uniqTagsIds.slice(0, (i + 1) * 100) })
 
