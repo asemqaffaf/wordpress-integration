@@ -88,5 +88,7 @@
   "store/wordpress-integration.wordpressCategorySelect.allCategories": "store/wordpress-integration.wordpressCategorySelect.allCategories",
   "store/wordpress-integration.wordpressCategorySelect.filterByCategory": "store/wordpress-integration.wordpressCategorySelect.filterByCategory",
   "store/wordpress-integration.WordpressTagSelect.allTags": "store/wordpress-integration.WordpressTagSelect.allTags",
-  "store/wordpress-integration.WordpressTagSelect.filterByTag": "store/wordpress-integration.WordpressTagSelect.filterByTag" 
+  "store/wordpress-integration.WordpressTagSelect.filterByTag": "store/wordpress-integration.WordpressTagSelect.filterByTag",
+  "store/wordpress-integration.wordpressOrder.order": "store/wordpress-integration.wordpressOrder.order",
+  "store/wordpress-integration.wordpressOrder.orderByDate": "store/wordpress-integration.wordpressOrder.orderByDate"
 }

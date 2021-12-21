@@ -89,5 +89,7 @@
   "store/wordpress-integration.wordpressCategorySelect.allCategories": "Todas las categorías",
   "store/wordpress-integration.wordpressCategorySelect.filterByCategory": "Filtrar por categoría",
   "store/wordpress-integration.WordpressTagSelect.allTags": "Todas las etiquetas",
-  "store/wordpress-integration.WordpressTagSelect.filterByTag": "Filtrar por etiquetas"
+  "store/wordpress-integration.WordpressTagSelect.filterByTag": "Filtrar por etiquetas",
+  "store/wordpress-integration.wordpressOrder.order": "Pedido",
+  "store/wordpress-integration.wordpressOrder.orderByDate": "Ordenar por fecha"
 }

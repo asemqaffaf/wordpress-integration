@@ -19,4 +19,5 @@ declare module 'vtex.styleguide' {
   export const withToast
   export const ButtonWithIcon
   export const Pagination
+  export const EXPERIMENTAL_Select
 }

@@ -10,20 +10,32 @@ import React, {
 import { useQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
 import { useRuntime } from 'vtex.render-runtime'
-import { Spinner, Pagination } from 'vtex.styleguide'
+import { Spinner, Pagination, EXPERIMENTAL_Select as Select } from 'vtex.styleguide'
 import Helmet from 'react-helmet'
 import { useCssHandles } from 'vtex.css-handles'
 
 import WordpressTeaser from './WordpressTeaser'
 import CategoryPostsBySlug from '../graphql/CategoryPostsBySlug.graphql'
 import Settings from '../graphql/Settings.graphql'
+import AllTags from '../graphql/AllTags.graphql'
+import WordpressOrderBySelect from './WordpressOrderBySelect'
+
 
 interface CategoryProps {
   customDomains: string
   postsPerPage: number
   mediaSize: MediaSize
 }
-
+type WPOrderType = 'desc' | 'asc'
+type WPTagType = {
+  id: number
+  name: string
+  __typename: string
+}
+type WPTagSelectType = {
+  label: string
+  value: WPTagType
+}
 const CSS_HANDLES = [
   'listTitle',
   'listContainer',
@@ -62,6 +74,10 @@ const WordpressCategory: StorefrontFunctionComponent<CategoryProps> = ({
   const [page, setPage] = useState(parseInt(initialPage, 10))
   const [perPage, setPerPage] = useState(postsPerPage)
   const [selectedOption, setSelectedOption] = useState(postsPerPage)
+  const [order, setOrder] = useState<WPOrderType>('desc')
+  const [selectedTag, setSelectedTag] = useState<WPTagSelectType[]>([])
+  const [tags, setTags] = useState<WPTagSelectType[]>([])
+
   const categoryVariable = {
     categorySlug:
       params.subcategoryslug_id ||
@@ -76,6 +92,18 @@ const WordpressCategory: StorefrontFunctionComponent<CategoryProps> = ({
       wp_page: 1,
       wp_per_page: perPage,
       customDomain,
+      order: order,
+      orderby: 'date',
+      tags: (() => selectedTag.length ? selectedTag.map(({ value }) => value.id) : undefined)()
+    },
+    skip: !categoryVariable.categorySlug,
+  })
+
+  const { loading: tagsLoading, error: tagsError, data: allTags } = useQuery(AllTags, {
+    variables: {
+      ...categoryVariable,
+      customDomain,
+      postsHasLessThanTags: 20
     },
     skip: !categoryVariable.categorySlug,
   })
@@ -86,8 +114,10 @@ const WordpressCategory: StorefrontFunctionComponent<CategoryProps> = ({
 
   useEffect(() => {
     setLoadingPage(true)
+    loadTagsHandler()
   }, [page])
   useEffect(() => {
+    loadTagsHandler()
     data && setLoadingPage(false)
   }, [data])
 
@@ -108,6 +138,22 @@ const WordpressCategory: StorefrontFunctionComponent<CategoryProps> = ({
     }
   }, [page])
 
+
+  const loadTagsHandler = (): any => {
+
+    if (allTags && allTags.wpAllTags) {
+      const filterTagsList = allTags.wpAllTags.tags.reduce((accu: WPTagSelectType[], tag: WPTagType) => {
+
+        accu.push({ value: tag, label: tag.name.charAt(0).toUpperCase() + tag.name.slice(1) })
+        return accu
+      }, [])
+      const nonDuplicateTagsList = [...new Map(filterTagsList.map((v: WPTagSelectType) => [v.value.id, v])).values()] as WPTagSelectType[]
+
+      setTags(nonDuplicateTagsList)
+    }
+
+  }
+
   const PaginationComponent = (
     <Pagination
       rowsOptions={[
@@ -124,7 +170,7 @@ const WordpressCategory: StorefrontFunctionComponent<CategoryProps> = ({
         dataS?.appSettings?.displayShowRowsText === false
           ? null
           : // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            intl.formatMessage(messages.postsPerPage)
+          intl.formatMessage(messages.postsPerPage)
       }
       totalItems={data?.wpCategories?.categories[0]?.wpPosts?.total_count ?? 0}
       onRowsChange={({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
@@ -207,6 +253,25 @@ const WordpressCategory: StorefrontFunctionComponent<CategoryProps> = ({
           },
         })
       }}
+      children={<div>
+        <WordpressOrderBySelect
+          appData={dataS}
+          setOrder={setOrder}
+          order={order}
+        />
+        <Select
+          loading={tagsLoading}
+          placeholder={'Tags'}
+          defaultValue={tags[0]}
+          multi={true}
+          label="Tags"
+          options={tags}
+          value={selectedTag}
+          onChange={(values: WPTagSelectType[]) => {
+            setSelectedTag(values)
+          }}
+        />
+      </div>}
     />
   )
   return (
@@ -241,6 +306,11 @@ const WordpressCategory: StorefrontFunctionComponent<CategoryProps> = ({
         {error && (
           <div className="ph5" style={{ minHeight: 800 }}>
             Error: {error.message}
+          </div>
+        )}
+        {tagsError && (
+          <div className="ph5" style={{ minHeight: 800 }}>
+            Error: {tagsError.message}
           </div>
         )}
         {data?.wpCategories?.categories?.length ? (

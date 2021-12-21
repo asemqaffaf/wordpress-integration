@@ -1,0 +1,14 @@
+query AllTags(
+  $tag: String
+  $customDomain: String
+  $categorySlug: String!
+  $postsHasLessThanTags: Int
+) {
+  wpAllTags(slug: [$categorySlug],search: $tag, customDomain: $customDomain, postsHasLessThanTags: $postsHasLessThanTags) {
+    tags {
+      name
+      id
+    }
+    total_count
+  }
+}

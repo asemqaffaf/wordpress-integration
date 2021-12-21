@@ -3,6 +3,10 @@ query CategoryPostsBySlug(
   $wp_per_page: Int
   $categorySlug: String!
   $customDomain: String
+  $orderby: String
+  $order: String
+  $tags: [Int]
+  $tags_exclude: [Int]
 ) {
   wpCategories(slug: [$categorySlug], customDomain: $customDomain) {
     categories {
@@ -12,6 +16,10 @@ query CategoryPostsBySlug(
         page: $wp_page
         per_page: $wp_per_page
         customDomain: $customDomain
+        orderby: $orderby
+        order: $order
+        tags: $tags
+        tags_exclude: $tags_exclude
       ) {
         posts {
           title {

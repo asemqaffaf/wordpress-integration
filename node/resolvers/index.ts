@@ -2,6 +2,7 @@ import { LogLevel } from '@vtex/api'
 
 import searchPostTagsAndContent from '../utils/search'
 import { addCSShandles, addHeaderTags } from '../utils/jsdom'
+import { allTagsResolvers } from './allTagsResolvers'
 
 /* eslint-disable @typescript-eslint/camelcase */
 export const queries = {
@@ -634,4 +635,5 @@ export const queries = {
     const settings = await ctx.clients.apps.getAppSettings(appId)
     return settings
   },
+  wpAllTags: allTagsResolvers.wpPosts,
 }
